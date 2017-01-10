@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ meta.fullTitle }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body class="{% block bodyClass %}{% endblock %}" data-env="{{ meta.environment }}">
+<header><div class="header">
+hammerspace
+</div></header>
+<main>
+    <div class="layout--max">
+        {% block body %}{% endblock %}
+    </div>
+</main>
+</body>
+</html>

@@ -17,17 +17,16 @@ class AppKernel extends Kernel
     {
         $bundles = [
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-//            new Symfony\Bundle\TwigBundle\TwigBundle(),
-//            new Symfony\Bundle\MonologBundle\MonologBundle(),
-//            new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
-//            new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
-//            new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
-//            new BBC\FaucetBundle\FaucetBundle(),
+            new Symfony\Bundle\TwigBundle\TwigBundle(),
+            new Symfony\Bundle\MonologBundle\MonologBundle(),
+            new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
+            new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
+            new AppBundle\AppBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {
             $bundles[] = new Symfony\Bundle\DebugBundle\DebugBundle();
-//            $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
+            $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
         }
 
         return $bundles;

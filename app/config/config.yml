@@ -1,0 +1,94 @@
+imports:
+    - { resource: parameters.yml }
+
+parameters:
+    locale: en-GB
+    enable_robots_txt: true
+
+framework:
+    #esi:             ~
+    #translator:      { fallbacks: ["%locale%"] }
+    secret:          "%secret%"
+    router:
+        resource: "%kernel.root_dir%/config/routing.yml"
+        strict_requirements: ~
+    form:            ~
+    csrf_protection: ~
+    validation:      { enable_annotations: true }
+    #serializer:      { enable_annotations: true }
+    templating:
+        engines: ['twig']
+        #assets_version: SomeVersionScheme
+    default_locale:  "%locale%"
+    trusted_hosts:   ~
+    trusted_proxies: ~
+    session:
+        # handler_id set to null will use default session handler from php.ini
+        handler_id:  ~
+        name: SESSION_IDENTITY
+    fragments:       ~
+    http_method_override: true
+    assets: ~
+
+# Twig Configuration
+twig:
+    debug:            "%kernel.debug%"
+    strict_variables: "%kernel.debug%"
+    form_themes:
+        - 'AppBundle:forms:fields.html.twig'
+    exception_controller:  "controller.exception:showAction"
+
+services:
+    controller.exception:
+        class: AppBundle\Controller\ErrorController
+        arguments: ["@twig", "%kernel.debug%"]
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver:   pdo_mysql
+        host:     "%database_host%"
+        port:     "%database_port%"
+        dbname:   "%database_name%"
+        user:     "%database_user%"
+        password: "%database_password%"
+        charset:  UTF8
+        types:
+            uuid_binary:
+                class: Ramsey\Uuid\Doctrine\UuidBinaryType
+        # if using pdo_sqlite as your database driver:
+        #   1. add the path in parameters.yml
+        #     e.g. database_path: "%kernel.root_dir%/data/data.db3"
+        #   2. Uncomment database_path in parameters.yml.dist
+        #   3. Uncomment next line:
+        #     path:     "%database_path%"
+
+    orm:
+        auto_generate_proxy_classes: "%kernel.debug%"
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        mappings:
+            SupportService:
+                dir:  %kernel.root_dir%/../src/SupportService/Data/Database/Entity
+                is_bundle: false
+                type: annotation
+                prefix: SupportService\Data\Database\Entity
+
+# Doctrine migrations
+doctrine_migrations:
+    dir_name: %kernel.root_dir%/../src/SupportService/Data/Database/Migration
+    namespace: SecuritiesService\Data\Database\Migration
+    table_name: migration_versions
+    name: Application Migrations
+
+monolog:
+    handlers:
+        main:
+            type:         fingers_crossed
+            action_level: error
+            handler:      nested
+        nested:
+            type:  stream
+            path:  "%kernel.logs_dir%/%kernel.environment%.log"
+            level: debug
+        console:
+            type:  console
