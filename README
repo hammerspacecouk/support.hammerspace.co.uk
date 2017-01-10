@@ -1,0 +1,5 @@
+# support.hammerspace.co.uk
+
+This is a simple application to test and handle web payments.
+It is built as a PHP 7.1 application (fully hinted with Strict Types) with full test suite.
+It uses Docker for local development
