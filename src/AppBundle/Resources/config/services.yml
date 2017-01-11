@@ -7,3 +7,9 @@ services:
 
   app.time_provider:
       class: DateTimeImmutable
+
+  app.services.payments:
+      class: SupportService\Service\PaymentsService
+      arguments:
+          - "@doctrine.orm.default_entity_manager"
+          - "@app.time_provider"

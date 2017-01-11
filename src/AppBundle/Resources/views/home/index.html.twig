@@ -1,4 +1,64 @@
 {% extends 'AppBundle::base.html.twig' %}
 {% block body %}
-<h1>Hello {{ name }}</h1>
+
+    <form action="{{ formAction }}" method="POST">
+        <div>
+        <label>
+            Name:
+            <input type="text" name="name" />
+        </label>
+        </div>
+        <div>
+        <label>
+            Amount:
+            <input type="number" name="amount" min="1" />
+        </label>
+        </div>
+        <div>
+        <label>
+            Message:
+            <input type="text" name="message" maxlength="100" />
+        </label>
+        </div>
+        <div>
+        <button type="submit">Submit</button>
+        </div>
+    </form>
+    <h3>Notes:</h3>
+    <ul>
+        <li>Your payment or e-mail information will not be stored by hammerspace</li>
+        <li>This is a donation. Do not expect anything specific in return or any refunds</li>
+    </ul>
+
+
+        <!--
+    <form action="/process" method="POST">
+        <script
+                src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                data-key="pk_test_e9tPcvzfHBEcrwYHOqiJYAjd"
+                data-name="hammerspace"
+                data-description="Support Us"
+                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                data-locale="auto"
+                data-zip-code="true"
+                data-currency="gbp">
+        </script>
+    </form>-->
+
+    <h2 id="supporters">Supporters</h2>
+    {% if hasResults %}
+        <ol start="{{ resultStartNumber }}">
+        {% for payment in payments %}
+            <li>
+                <h3>{{ payment.name }}</h3>
+                <p>{{ payment.date }}</p>
+                {% if payment.message %}
+                    <p>{{ payment.message }}</p>
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ol>
+    {% else %}
+        <p>No supporters yet</p>
+    {% endif %}
 {% endblock %}

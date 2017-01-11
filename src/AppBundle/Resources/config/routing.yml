@@ -2,3 +2,7 @@
 home:
   path:     /
   defaults: { _controller: AppBundle:Home:index }
+
+process:
+  path:     /process
+  defaults: { _controller: AppBundle:Home:process }
