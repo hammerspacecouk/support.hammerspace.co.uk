@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 namespace SupportService\Data\Database\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -14,8 +14,10 @@ class Payment extends Entity
 {
     /** @ORM\Column(type="string") */
     public $name;
-    /** @ORM\Column(type="date") */
+    /** @ORM\Column(type="datetime") */
     public $date;
+    /** @ORM\Column(type="float") */
+    public $amount;
     /** @ORM\Column(type="text", nullable=true) */
     public $message;
 }

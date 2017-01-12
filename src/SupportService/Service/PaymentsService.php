@@ -1,7 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 namespace SupportService\Service;
+
+use DateTimeImmutable;
+use SupportService\Data\Database\Entity\Payment as DbPayment;
+use SupportService\Domain\Entity\Payment;
 
 class PaymentsService extends Service
 {
@@ -18,8 +22,28 @@ class PaymentsService extends Service
         int $limit,
         int $page
     ): array {
-        $qb = $this->getQueryBuilder(self::ENTITY);
+        $qb = $this->getQueryBuilder(self::ENTITY)
+            ->orderBy('tbl.date', 'DESC');
         $qb = $this->paginate($qb, $limit, $page);
         return $this->getDomainFromQuery($qb, self::ENTITY);
+    }
+
+    public function createPayment(
+        string $name,
+        ?string $message,
+        float $amount,
+        DateTimeImmutable $date
+    ): Payment {
+        // create a user database entity
+        $payment = new DbPayment();
+        $payment->name = $name;
+        $payment->message = $message;
+        $payment->date = $date;
+        $payment->amount = $amount;
+
+        $this->entityManager->persist($payment);
+        $this->entityManager->flush();
+
+        return $this->mapperFactory->createPayment()->getDomainModel($payment);
     }
 }

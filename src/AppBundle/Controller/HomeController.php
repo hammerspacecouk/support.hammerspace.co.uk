@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 namespace AppBundle\Controller;
 
 use SupportService\Domain\Entity\Payment;
@@ -25,7 +25,7 @@ class HomeController extends Controller
         }
 
         if ($totalCount > 0) {
-            $paymentData = $paymentsService->findAll($currentPage, self::PAGE_LIMIT);
+            $paymentData = $paymentsService->findAll(self::PAGE_LIMIT, $currentPage);
             foreach ($paymentData as $payment) {
                 $payments[] = $this->makePaymentView($payment);
             }
@@ -47,7 +47,23 @@ class HomeController extends Controller
 
     public function processAction()
     {
+        if (!$this->request->isMethod('POST')) {
+            throw new HttpException(405, 'Must be POST'); // todo - ensure the code is sent to the user
+        }
+        $name = $this->request->get('name');
+        $amount = (float) $this->request->get('amount');
+        $message = $this->request->get('message');
+        if (empty($message)) {
+            $message = null;
+        }
+        $date = $this->get('app.time_provider');
 
+        $payment = $this->get('app.services.payments')->createPayment($name, $message, $amount, $date);
+
+        $this->toView('payment', $this->makePaymentView($payment));
+        $this->toView('returnLink', $this->generateUrl('home') . '?done=' . time());
+
+        return $this->renderTemplate('home:process');
     }
 
     public function robotsAction()

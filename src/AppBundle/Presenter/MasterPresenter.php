@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 namespace AppBundle\Presenter;
 
 /**
@@ -17,7 +17,7 @@ class MasterPresenter
         'siteTitle' => '',
         'environment' => 'prod',
         'canonicalUrl' => '',
-        'isOk' => true
+        'isOk' => true,
     ];
 
     public function __construct($env = null)

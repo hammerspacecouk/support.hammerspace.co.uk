@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 namespace SupportService\Domain\Entity;
 
 abstract class Entity
