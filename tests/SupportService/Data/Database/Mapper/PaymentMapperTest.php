@@ -12,14 +12,13 @@ class PaymentMapperTest extends \PHPUnit_Framework_TestCase
 {
     public function testFromArray()
     {
-        $dateIso = '2017-01-01T12:00:00+00:00';
         $mapper = $this->getMapper();
         $domain = $mapper->getDomainModel([
             'id' => $id = 987,
             'name' => $name = 'Mickey',
             'message' => $message = 'Haw haw',
             'amount' => $amount = 4.56,
-            'date' => new \DateTime($dateIso),
+            'date' => $date = new \DateTime('2017-01-01T12:00:00+00:00'),
         ]);
         $this->assertInstanceOf(Payment::class, $domain);
         $this->assertSame($id, $domain->getId());
@@ -27,17 +26,16 @@ class PaymentMapperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($message, $domain->getMessage());
         $this->assertSame($amount, $domain->getAmount());
         $this->assertInstanceOf(\DateTimeImmutable::class, $domain->getDate());
-        $this->assertSame($dateIso, $domain->getDate()->format('c'));
+        $this->assertEquals($date, $domain->getDate());
     }
 
     public function testFromEntity()
     {
         $mapper = $this->getMapper();
-        $entity = $this->createMock(DbPayment::class);
-        $dateIso = '2017-01-01T12:00:00+00:00';
+        $entity = new DbPayment();
         $entity->id = $id = 123;
         $entity->name = $name = 'Minnie';
-        $entity->date = new \DateTime($dateIso);
+        $entity->date = $date = new \DateTime('2017-01-01T12:00:00+00:00');
         $entity->message = null;
         $entity->amount = $amount = 4.56;
 
@@ -49,7 +47,7 @@ class PaymentMapperTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($domain->getMessage());
         $this->assertSame($amount, $domain->getAmount());
         $this->assertInstanceOf(\DateTimeImmutable::class, $domain->getDate());
-        $this->assertSame($dateIso, $domain->getDate()->format('c'));
+        $this->assertEquals($date, $domain->getDate());
     }
 
     private function getMapper()

@@ -9,6 +9,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
 {
     public function testId()
     {
+        /** @var Entity $entity */
         $entity = $this->getMockForAbstractClass(Entity::class);
 
         $this->assertNull($entity->createdAt);

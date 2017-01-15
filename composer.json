@@ -10,7 +10,10 @@
     }
   },
   "autoload-dev": {
-    "psr-4": { "Tests\\SupportService\\": "tests/SupportService/" }
+    "psr-4": {
+      "Tests\\AppBundle\\": "tests/AppBundle/",
+      "Tests\\SupportService\\": "tests/SupportService/"
+    }
   },
   "require": {
     "php": "^7.1",

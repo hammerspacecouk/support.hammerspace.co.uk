@@ -7,6 +7,7 @@ use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\DBAL\Logging\DebugStack;
+use Doctrine\ORM\EntityManager;
 use Psr\Log\NullLogger;
 
 class AbstractDatabaseTestCase extends \PHPUnit_Framework_TestCase
@@ -55,13 +56,13 @@ class AbstractDatabaseTestCase extends \PHPUnit_Framework_TestCase
 
     protected function getOrmExecutor()
     {
-//        if (is_null($this->ormExecutor)) {
+        if (is_null($this->ormExecutor)) {
             $this->ormExecutor = new ORMExecutor($this->getEntityManager(), new ORMPurger());
-//        }
+        }
         return $this->ormExecutor;
     }
 
-    protected function getEntityManager()
+    protected function getEntityManager(): EntityManager
     {
         if (is_null(self::$entityManager)) {
             self::$entityManager = require __DIR__ . '/doctrine-bootstrap.php';
