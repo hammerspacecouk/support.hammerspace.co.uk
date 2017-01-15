@@ -8,6 +8,8 @@ namespace SupportService\Data\Database\Mapper;
  */
 class MapperFactory
 {
+    private $instances = [];
+
     public function createMapper(string $type): Mapper
     {
         $mapperMethod = 'create' . $type;
@@ -19,6 +21,9 @@ class MapperFactory
 
     public function createPayment(): PaymentMapper
     {
-        return new PaymentMapper($this);
+        if (!isset($this->instances['PaymentMapper'])) {
+            $this->instances['PaymentMapper'] = new PaymentMapper($this);
+        }
+        return $this->instances['PaymentMapper'];
     }
 }

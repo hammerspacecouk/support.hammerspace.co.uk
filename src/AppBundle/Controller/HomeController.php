@@ -3,13 +3,18 @@
 declare(strict_types = 1);
 namespace AppBundle\Controller;
 
+use Stripe\Charge;
+use Stripe\Error\Base;
+use Stripe\Stripe;
 use SupportService\Domain\Entity\Payment;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class HomeController extends Controller
 {
-    private const PAGE_LIMIT = 30;
+    private const PAGE_LIMIT = 5;
 
     public function indexAction()
     {
@@ -32,38 +37,73 @@ class HomeController extends Controller
         }
 
         $hasNextPage = $currentPage < $totalPages;
-        $hasPrevPage = $currentPage > 1;
+        $nextPageLink = null;
+        if ($hasNextPage) {
+            $nextPageLink = $this->generateUrl('home') . '?page=' . ($currentPage + 1);
+        }
 
+        $hasPrevPage = $currentPage > 1;
+        $prevPageLink = null;
+        if ($hasPrevPage) {
+            $prevPageLink = $this->generateUrl('home');
+            if ($currentPage > 2) {
+                $prevPageLink .= '?page=' . ($currentPage - 1);
+            }
+        }
+
+        $this->toView('stripeKey', $this->getParameter('stripe_key'));
         $this->toView('formAction', $this->generateUrl('process'));
         $this->toView('payments', $payments);
         $this->toView('resultStartNumber', (self::PAGE_LIMIT * ($currentPage-1)) + 1);
         $this->toView('hasResults', !empty($payments));
         $this->toView('hasPages', $hasPrevPage || $hasNextPage);
-        $this->toView('hasNextPage', $hasNextPage);
-        $this->toView('hasPrevPage', $hasPrevPage);
+        $this->toView('nextPage', $nextPageLink);
+        $this->toView('prevPage', $prevPageLink);
 
-        return $this->renderTemplate('home:index');
+        $this->toView('paymentError', $this->request->get('error', null));
+        $this->toView('paymentSuccess', $this->request->get('payment', null));
+
+        return $this->renderTemplate('home:index', 'Support us');
     }
 
     public function processAction()
     {
         if (!$this->request->isMethod('POST')) {
-            throw new HttpException(405, 'Must be POST'); // todo - ensure the code is sent to the user
+            throw new MethodNotAllowedHttpException(['POST'], 'Must be POST');
         }
+        $token = $this->request->get('paymentToken');
         $name = $this->request->get('name');
         $amount = (float) $this->request->get('amount');
         $message = $this->request->get('message');
         if (empty($message)) {
             $message = null;
         }
+
+        if (!$token) {
+            throw new BadRequestHttpException('Invalid request. No token found');
+        }
+
+        Stripe::setApiKey($this->getParameter('stripe_secret'));
+        try {
+            $charge = Charge::create([
+                'amount' => $amount * 100,
+                'currency' => 'gbp',
+                'description' => 'hammerspace Donation - ' . $name,
+                'source' => $token,
+            ]);
+            $this->get('logger')->notice('Successful payment of ' . $amount . ' from ' . $name);
+        } catch (Base $e) {
+            $this->get('logger')->error(
+                'Failure to process payment of ' . $amount . ' from ' . $name . '. Message: ' . $e->getMessage()
+            );
+            return $this->redirectToRoute('home', ['error' => 'payment']);
+        }
+        $chargeId = $charge->id;
         $date = $this->get('app.time_provider');
 
-        $payment = $this->get('app.services.payments')->createPayment($name, $message, $amount, $date);
+        $this->get('app.services.payments')->createPayment($name, $message, $amount, $date, $chargeId);
 
-        $this->toView('payment', $this->makePaymentView($payment));
-        $this->toView('returnLink', $this->generateUrl('home') . '?done=' . time());
-
-        return $this->renderTemplate('home:process');
+        return $this->redirectToRoute('home', ['payment' => time()]);
     }
 
     public function robotsAction()

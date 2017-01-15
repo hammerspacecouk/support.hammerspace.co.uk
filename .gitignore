@@ -5,3 +5,4 @@
 /node_modules
 /tmp/
 build/
+/src/SupportService/tests/db.sqlite

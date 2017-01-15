@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Psr\Log\LoggerInterface;
 use SupportService\Data\Database\Mapper\MapperFactory;
 
 abstract class Service
@@ -19,14 +20,17 @@ abstract class Service
     protected $entityManager;
     protected $appTimeProvider;
     protected $mapperFactory;
+    protected $logger;
 
     public function __construct(
         EntityManager $entityManager,
-        DateTimeImmutable $appTimeProvider
+        DateTimeImmutable $appTimeProvider,
+        LoggerInterface $logger
     ) {
         $this->entityManager = $entityManager;
         $this->mapperFactory = new MapperFactory();
         $this->appTimeProvider = $appTimeProvider;
+        $this->logger = $logger;
     }
 
     protected function getEntity(string $name): EntityRepository

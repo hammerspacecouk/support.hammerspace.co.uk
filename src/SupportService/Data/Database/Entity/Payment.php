@@ -12,12 +12,14 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Payment extends Entity
 {
-    /** @ORM\Column(type="string") */
+    /** @ORM\Column(type="string", nullable=false) */
     public $name;
-    /** @ORM\Column(type="datetime") */
+    /** @ORM\Column(type="datetime", nullable=false) */
     public $date;
-    /** @ORM\Column(type="float") */
+    /** @ORM\Column(type="float", nullable=false) */
     public $amount;
     /** @ORM\Column(type="text", nullable=true) */
     public $message;
+    /** @ORM\Column(type="string", nullable=false) */
+    public $chargeId;
 }

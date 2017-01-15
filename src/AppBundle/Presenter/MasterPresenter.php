@@ -50,7 +50,7 @@ class MasterPresenter
         if (isset($this->data[$key])) {
             return $this->data[$key]->data;
         }
-        throw new \Exception(); // todo - use a custom one
+        throw new \InvalidArgumentException();
     }
 
     public function getData()
@@ -82,7 +82,7 @@ class MasterPresenter
     public function setTitle(string $title)
     {
         $this->meta['title'] = $title;
-        $this->meta['fullTitle'] = $title;
+        $this->meta['fullTitle'] = $title . ' - hammerspace';
     }
 
     // use this when you don't want the auto appended suffix

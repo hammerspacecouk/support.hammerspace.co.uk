@@ -13,3 +13,4 @@ services:
       arguments:
           - "@doctrine.orm.default_entity_manager"
           - "@app.time_provider"
+          - "@logger"

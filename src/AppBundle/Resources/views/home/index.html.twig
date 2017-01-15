@@ -1,64 +1,175 @@
 {% extends 'AppBundle::base.html.twig' %}
 {% block body %}
+    <h1>Support hammerspace</h1>
 
-    <form action="{{ formAction }}" method="POST">
-        <div>
-        <label>
-            Name:
-            <input type="text" name="name" maxlength="30" />
-        </label>
-        </div>
-        <div>
-        <label>
-            Amount:
-            <input type="number" name="amount" min="1" step="0.01" />
-        </label>
-        </div>
-        <div>
-        <label>
-            Message:
-            <input type="text" name="message" maxlength="100" />
-        </label>
-        </div>
-        <div>
-            <button type="submit">Submit</button>
-        </div>
-    </form>
-    <h3>Notes:</h3>
-    <ul>
-        <li>Your payment or e-mail information will not be stored by hammerspace</li>
-        <li>This is a donation. Do not expect anything specific in return or any refunds</li>
-    </ul>
+    <div class="layout">
+        <div class="layout__main">
+            {% if paymentError %}
+                <p class="message message--error">
+                    There was an error processing your payment.
+                    Please try again, or don't worry about it.
+                    We won't be offended.
+                </p>
+            {% endif %}
+            {% if paymentSuccess %}
+                <p class="message message--ok">
+                    Thank you kindly for your donation.
+                </p>
+            {% endif %}
+            <p>
+                Want us to keep doing what we're doing? Why not support us with a donation?
+                This is actually just a good way to test our payment system. Any money donated
+                will go to the company, and that can only mean good things.
+            </p>
+            <noscript>
+                <p><strong>
+                        Our payment form requires JavaScript. Not ideal, but that's the way it is right now.
+                        Luckily, only we suffer because of that.
+                </strong></p>
+            </noscript>
+            <form class="form hidden" action="{{ formAction }}" method="post" id="form">
+                <input type="hidden" name="paymentToken" id="form-paymentToken" />
+                <div class="form__row">
+                    <label>
+                        <span class="form__label">
+                            Name
+                            <span class="form__label-sub" id="form-count-name">30</span>
+                        </span>
+                        <input class="form__input" type="text" name="name" maxlength="30" data-count="form-count-name" required />
+                    </label>
+                    <p class="form__description">This doesn't have to be your real name</p>
+                </div>
+                <div class="form__row">
+                    <label>
+                        <span class="form__label">
+                            Amount
+                            <span class="form__label-sub">(£)</span>
+                        </span>
+                        <input class="form__input" type="number" id="form-amount" name="amount" min="1" step="0.01" required />
+                    </label>
+                    <p class="form__description">Minimum £1, otherwise why bother</p>
+                </div>
+                <div class="form__row">
+                    <label>
+                        <span class="form__label">
+                            Message
+                            <span class="form__label-sub" id="form-count-message">100</span>
+                        </span>
+                        <input class="form__input" type="text" name="message" maxlength="100" data-count="form-count-message" />
+                    </label>
+                    <p class="form__description">
+                        Why did you do this? What should we spend it on? How's the weather?
+                        Say what you like.
+                    </p>
+                </div>
+                <div class="form__row">
+                    <button class="form__button">Donate</button>
+                </div>
+            </form>
 
-
-        <!--
-    <form action="/process" method="POST">
-        <script
-                src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                data-key="pk_test_e9tPcvzfHBEcrwYHOqiJYAjd"
-                data-name="hammerspace"
-                data-description="Support Us"
-                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-                data-locale="auto"
-                data-zip-code="true"
-                data-currency="gbp">
-        </script>
-    </form>-->
-
-    <h2 id="supporters">Supporters</h2>
-    {% if hasResults %}
-        <ol start="{{ resultStartNumber }}">
-        {% for payment in payments %}
-            <li>
-                <h3>{{ payment.name }}</h3>
-                <p>{{ payment.date }}</p>
-                {% if payment.message %}
-                    <p>{{ payment.message }}</p>
+            <h2>Notes:</h2>
+            <ul>
+                <li>Your payment or e-mail information will not be stored by hammerspace</li>
+                <li>This is a donation. Do not expect anything specific in return or any refunds</li>
+                <li>Your message can be what you like but we may have to moderate it if it isn't clean</li>
+            </ul>
+        </div>
+        {% if hasResults %}
+            <div class="layout__aside layout__aside--box">
+                <h2 id="supporters">Supporters</h2>
+                <ol class="supporters" start="{{ resultStartNumber }}">
+                {% for payment in payments %}
+                    <li class="supporter">
+                        <h3 class="supporter__name">{{ payment.name }}</h3>
+                        <p class="supporter__date">{{ payment.date }}</p>
+                        {% if payment.message %}
+                            <p class="supporter__message">{{ payment.message }}</p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                </ol>
+                {% if hasPages %}
+                    <div class="pgn">
+                        {% if prevPage %}
+                            <a class="pgn__link pgn__link--prev" href="{{ prevPage }}">
+                                <span class="pgn__link-icon">&lsaquo;</span> <span class="pgn__link-text">Newer</span>
+                            </a>
+                        {% endif %}
+                        {% if nextPage %}
+                            <a class="pgn__link pgn__link--next" href="{{ nextPage }}">
+                                <span class="pgn__link-text">Older</span> <span class="pgn__link-icon">&rsaquo;</span>
+                            </a>
+                        {% endif %}
+                    </div>
                 {% endif %}
-            </li>
-        {% endfor %}
-        </ol>
-    {% else %}
-        <p>No supporters yet</p>
-    {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    <script src="https://checkout.stripe.com/checkout.js"></script>
+    <script>
+        (function() {
+            var form = document.getElementById('form'),
+                handler = StripeCheckout.configure({
+                    key: '{{ stripeKey }}',
+                    image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+                    locale: 'auto',
+                    panelLabel: 'Donate {{ '{{amount}}' }}',
+                    token: function(token) {
+                        document.getElementById('loading-overlay').classList.remove('hidden');
+                        // You can access the token ID with `token.id`.
+                        // Get the token ID to your server-side code for use.
+                        document.getElementById('form-paymentToken').value = token.id;
+                        form.submit();
+                    }
+                });
+
+            function addListeners() {
+                var countBoxes = document.querySelectorAll('[data-count]'),
+                    countBoxesLen = countBoxes.length,
+                    i;
+                document.getElementById('form').addEventListener('submit', function(e) {
+                    var amount = parseFloat(document.getElementById('form-amount').value);
+                    // Open Checkout with further options:
+                    handler.open({
+                        name: 'hammerspace',
+                        description: 'Support us',
+                        currency: 'gbp',
+                        amount: amount * 100 // has to be in pence
+                    });
+                    e.preventDefault();
+                });
+
+                // Close Checkout on page navigation:
+                window.addEventListener('popstate', function() {
+                    handler.close();
+                });
+
+                // listeners for countdown
+                for (i=0;i<countBoxesLen;i++) {
+                    countBoxes[i].addEventListener('change', handleCount);
+                    countBoxes[i].addEventListener('keyup', handleCount);
+                }
+            }
+
+            function handleCount(e) {
+                var input = e.target,
+                    countTarget = document.getElementById(input.dataset.count),
+                    maxLen = input.maxLength,
+                    value = input.value;
+
+                countTarget.textContent = maxLen - value.length;
+            }
+
+            function setup() {
+                form.classList.remove('hidden');
+                addListeners();
+            }
+
+            if('querySelector' in document
+                && 'addEventListener' in window) {
+                    setup();
+            }
+        }());
+
+    </script>
 {% endblock %}

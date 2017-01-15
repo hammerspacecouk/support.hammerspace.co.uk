@@ -32,7 +32,8 @@ class PaymentsService extends Service
         string $name,
         ?string $message,
         float $amount,
-        DateTimeImmutable $date
+        DateTimeImmutable $date,
+        string $chargeId
     ): Payment {
         // create a user database entity
         $payment = new DbPayment();
@@ -40,6 +41,7 @@ class PaymentsService extends Service
         $payment->message = $message;
         $payment->date = $date;
         $payment->amount = $amount;
+        $payment->chargeId = $chargeId;
 
         $this->entityManager->persist($payment);
         $this->entityManager->flush();

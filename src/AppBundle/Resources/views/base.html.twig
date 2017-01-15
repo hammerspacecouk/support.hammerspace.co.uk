@@ -4,15 +4,309 @@
     <meta charset="utf-8">
     <title>{{ meta.fullTitle }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Arima+Madurai:200,400" rel="stylesheet">
+    <style>
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        a,
+        a:link,
+        a:visited {
+            text-decoration: none;
+            color: #248849;
+        }
+        a:hover,
+        a:active,
+        a:focus {
+            color: #222;
+        }
+        h1, h2, h3 {
+            font-family: 'Arima Madurai', sans-serif;
+            line-height:1;
+        }
+        h2, h3 {
+            margin: 0;
+        }
+        p, ul {
+            margin-top: 0;
+            line-height:1.48;
+        }
+        ul {
+            list-style: square;
+        }
+        .header {
+            background: #248849;
+            font-family: 'Arima Madurai', sans-serif;
+            padding: 8px;
+            text-align: center;
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: lighter;
+        }
+        .header__link,
+        .header__link:link,
+        .header__link:visited {
+            color: #fff;
+        }
+        .header__link:hover,
+        .header__link:active,
+        .header__link:focus {
+            color: #000;
+        }
+        .main-area {
+            max-width: 1024px;
+            margin: 32px auto;
+            padding: 0 16px;
+        }
+
+        @media (min-width: 50em) {
+            .layout {
+                display: flex;
+            }
+            .layout__main {
+                width: 60%;
+                margin-right: 32px;
+            }
+            .layout__aside {
+                width: 40%;
+            }
+        }
+        .layout__aside--box {
+            background: #d9e7df;
+            padding: 16px;
+        }
+
+        .message {
+            display: block;
+            padding: 16px;
+            border: solid 1px;
+        }
+        .message--error {
+            color: #c00;
+            background: #ffc4c4;
+            border-color: #c00;
+        }
+        .message--ok {
+            color: #0c0;
+            background: #e0ffee;
+            border-color: #0c0;
+        }
+
+        .pgn {
+            text-align: center;
+            margin-top: 16px;
+        }
+        .pgn__link {
+            display: inline-block;
+            margin-left: 4px;
+            margin-right: 4px;
+            background: #248849;
+            padding: 0 12px;
+            line-height: 32px;
+            text-transform: uppercase;
+            position: relative;
+            border-radius: 3px;
+        }
+        .pgn__link--prev {
+            padding-left: 44px;
+        }
+        .pgn__link--next {
+            padding-right: 44px;
+        }
+        .pgn__link:link,
+        .pgn__link:visited {
+            color: #fff;
+        }
+        .pgn__link:hover,
+        .pgn__link:active,
+        .pgn__link:focus {
+            background: #222;
+        }
+        .pgn__link-icon {
+            font-size: 32px;
+            line-height: 27px;
+            position: absolute;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            background: #222;
+        }
+        .pgn__link--prev .pgn__link-icon {
+            left: 0;
+            border-top-left-radius: 3px;
+            border-bottom-left-radius: 3px;
+        }
+        .pgn__link--next .pgn__link-icon {
+            right: 0;
+            border-top-right-radius: 3px;
+            border-bottom-right-radius: 3px;
+        }
+        .supporters {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .supporter {
+            border-bottom: solid 1px #999;
+            padding: 16px 8px;
+            overflow: hidden;
+        }
+        .supporter:first-child {
+            border-top: solid 1px #999;
+            margin-top: 16px;
+        }
+        .supporter__date {
+            font-family: 'Arima Madurai', sans-serif;
+            font-style: italic;
+            font-size: 0.84rem;
+            margin: 0;
+        }
+        .supporter__message {
+            margin: 4px 0 0;
+            line-height: 1;
+        }
+
+        .form {
+            margin: 32px 0;
+        }
+        .form__row {
+            margin-bottom: 32px;
+        }
+        .form__label {
+            display: block;
+            margin-bottom: 4px;
+        }
+        .form__description {
+            margin-top: 4px;
+            font-size: 0.9rem;
+            font-style: italic;
+            color: #888;
+        }
+        .form__input {
+            display: block;
+            padding: 8px;
+            font-size: 1rem;
+            border: solid 1px #444;
+            width: 100%;
+        }
+        .form__input:focus {
+            border-color: #248849;
+        }
+        .form__label-sub {
+            font-size: 0.76rem;
+            color: #888;
+        }
+        .form__button {
+            background: #248849;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 3px;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .form__button:hover,
+        .form__button:active,
+        .form__button:focus {
+            background: #222;
+        }
+        .form__button:focus {
+            position: relative;
+            top: 1px;
+        }
+        .hidden {
+            display: none!important;
+        }
+
+        .loading-overlay {
+            background: rgba(0,0,0,.6);
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        @-webkit-keyframes loading-dash {
+            0% {
+                stroke-dashoffset: 54;
+            }
+            50% {
+                stroke-dashoffset: 14;
+                transform:rotate(135deg);
+            }
+            100% {
+                stroke-dashoffset: 54;
+                transform:rotate(450deg);
+            }
+        }
+        @keyframes loading-dash {
+            0% {
+                stroke-dashoffset: 54;
+            }
+            50% {
+                stroke-dashoffset: 14;
+                transform:rotate(135deg);
+            }
+            100% {
+                stroke-dashoffset: 54;
+                transform:rotate(450deg);
+            }
+        }
+        @-webkit-keyframes loading-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(270deg); }
+        }
+        @keyframes loading-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(270deg); }
+        }
+        .loading {
+            width: 28px;
+            height: 28px;
+            margin-left: auto;
+            margin-right: auto;
+            transform-origin: center;
+            -webkit-animation: loading-rotate 1.4s linear infinite;
+            animation: loading-rotate 1.4s linear infinite;
+        }
+        .loading__spinner {
+            width: 28px;
+            height: 28px;
+        }
+        .loading__path {
+            stroke: #fff;
+            stroke-dasharray: 54;
+            stroke-dashoffset: 0;
+            stroke-linecap: round;
+            transform-origin: center;
+            -webkit-animation: loading-dash 1.4s ease-in-out infinite;
+            animation: loading-dash 1.4s ease-in-out infinite;
+        }
+    </style>
 </head>
 <body class="{% block bodyClass %}{% endblock %}" data-env="{{ meta.environment }}">
 <header><div class="header">
-hammerspace
+    <a class="header__link" href="http://www.hammerspace.co.uk">hammerspace</a>
 </div></header>
 <main>
-    <div class="layout--max">
+    <div class="main-area">
         {% block body %}{% endblock %}
     </div>
 </main>
+<div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loading">
+        <svg class="loading__spinner" viewBox="-2 -2 70 70" xmlns="http://www.w3.org/2000/svg">
+            <circle class="loading__path" fill="none" stroke-width="8" cx="33" cy="33" r="30"></circle>
+        </svg>
+    </div>
+</div>
 </body>
 </html>
